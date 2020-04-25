@@ -104,7 +104,7 @@ celerybeat.pid
 # Environments
 .env
 .venv
-env/
+env_PLUhomework/
 venv/
 ENV/
 env.bak/
@@ -127,3 +127,7 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# custom
+code/main_without_dict.py
+example-api-route.png
