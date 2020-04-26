@@ -46,10 +46,7 @@ def logout(response: Response, session_token: str = Cookie(None)):
     if session_token not in app.tokens:
         raise HTTPException(status_code = 401, detail = "Access denied")
     app.tokens.remove(session_token)
-    #return RedirectResponse(url = '/')
-    response.status_code = status.HTTP_302_FOUND
-    response.headers["Location"] = "/"
-    
+    return RedirectResponse(url = '/')  
 
 ###########################
 # first part [homework 1]
@@ -59,8 +56,7 @@ app.patients = []
 
 @app.get("/")
 def root():
-    #return {"message": "Hello World during the coronavirus pandemic!"}
-    return {"message": "finally someone let me out of my cage"}
+    return {"message": "Hello World during the coronavirus pandemic!"}
 
 @app.get("/method")
 def method_get():
