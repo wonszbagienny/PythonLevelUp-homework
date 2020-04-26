@@ -31,10 +31,10 @@ def login(credentials, response: Response):
 @app.get("/welcome")
 def welcome():
     if s_token in app.tokens:
-		return template.TemplateResponse("template1.html", {"request": request, "user": "trudnY" }
+		return {"message": "finally someone let me out of my cage"}
     else:
         raise HTTPException(status_code=401, detail="dostęp wzbroniony")
-    return {"message": "finally someone let me out of my cage"}
+    
 
 @app.post("/login")
 
