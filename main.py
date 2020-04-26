@@ -1,117 +1,104 @@
-# main.py
-######################################################################
-######################################################################
-#####################       ASSIGNMENT 1       #######################
-######################################################################
-######################################################################
-
-from fastapi import FastAPI, HTTPException
+from hashlib import sha256
+from fastapi import FastAPI, HTTPException, Response, Request, Depends, status
+from fastapi import Cookie
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from fastapi.templating import Jinja2Templates
+from fastapi.responses import JSONResponse
+from starlette.responses import RedirectResponse
+from typing import Dict
 from pydantic import BaseModel
+import secrets
 
 app = FastAPI()
-app.ID = 0
-app.patients = {}
-app.session_tokens = []
-app.secret_key = "very constant and random secret, best 64 characters, here it is."
 
-### TASK 1 ###########################################################
+###########################
+# second part [homework 3]
+
+app.secret_key = "very constant and random secret, best 64 characters"
+app.num = 0
+app.count = -1
+app.tokens = []
+
+template = Jinja2Templates(directory = "templates")
+
+security = HTTPBasic()
+
+@app.get("/welcome")
+def welcome(request: Request, session_token: str = Cookie(None)):
+    if session_token not in app.tokens:
+        raise HTTPException(status_code = 401, detail = "Access denied")
+    else:
+        return template.TemplateResponse("second.html", {"request": request, "user": "trudnY"})
+
+@app.post("/login")
+def login(response: Response, credentials: HTTPBasicCredentials = Depends(security)):
+    correct_username = secrets.compare_digest(credentials.username, "trudnY")
+    correct_password = secrets.compare_digest(credentials.password, "PaC13Nt")
+    if not (correct_username and correct_password):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect email or password")
+    session_token = sha256(bytes(f"{credentials.username}{credentials.password}{app.secret_key}", encoding='utf8')).hexdigest()
+    app.tokens.append(session_token)
+    response.set_cookie(key = "session_token", value = session_token)
+    response.headers["Location"] = "/welcome"
+    response.status_code = status.HTTP_302_FOUND 
+    #return RedirectResponse(url = '/welcome')
+
+@app.post("/logout")
+def logout(*, response: Response, session_token: str = Cookie(None)):
+    if session_token not in app.tokens:
+        raise HTTPException(status_code = 401, detail = "Access denied")
+    app.tokens.remove(session_token)
+    return RedirectResponse("/")
+
+###########################
+# first part [homework 1]
+
+app.no_of_patients = 0
+app.patients = []
 
 @app.get("/")
 def root():
     return {"message": "Hello World during the coronavirus pandemic!"}
 
-### TASK 2 ###########################################################
-
 @app.get("/method")
-def root():
+def method_get():
     return {"method": "GET"}
 
-@app.put("/method")
-def root():
-    return {"method": "PUT"}
-
 @app.post("/method")
-def root():
+def method_post():
     return {"method": "POST"}
 
+@app.put("/method")
+def method_put():
+    return {"method": "PUT"}
+
 @app.delete("/method")
-def root():
+def method_delete():
     return {"method": "DELETE"}
 
-### TASK 3 ###########################################################
+class GiveMeSomethingRq(BaseModel):
+    name: str
+    surname: str
 
-class PatientRq(BaseModel):
-	name: str
-	surname: str
+class GiveMeSomethingResp(BaseModel):
+    id: int = app.no_of_patients
+    patient: Dict
 
-class PatientResp(BaseModel):
-	id: int
-	patient: dict
+@app.post("/patient", response_model=GiveMeSomethingResp)
+def post_patient(rq: GiveMeSomethingRq):
+    returnID = app.no_of_patients
+    app.patients.append(rq.dict())
+    app.no_of_patients += 1
+    return GiveMeSomethingResp(id=returnID, patient=rq.dict())
 
-#@app.post("/patient", response_model=PatientResp)
-def receive_patient(rq: PatientRq):
-	if app.ID not in app.patients.keys():
-		app.patients[app.ID] = rq.dict()
-		app.ID += 1
-	return PatientResp(id=app.ID, patient=rq.dict())
+@app.get("/number_of_patients")
+def get_number():
+    return str(app.no_of_patients)
 
-### TASK 4 ###########################################################
-	
-#@app.get("/patient/{pk}")
-async def return_patient(pk: int):
-    if pk in app.patients.keys():
-    	return app.patients[pk]
+@app.get("/patient/{pk}")
+def get_patient(pk: int):
+    if (len(app.patients) > pk and pk >= 0):
+        return app.patients[pk]
     else:
-    	raise HTTPException(status_code=204, detail="Item not found")
+        raise HTTPException(status_code = 204, detail = "patient_not_found")
 
-######################################################################
-######################################################################
-#####################       ASSIGNMENT 3       #######################
-######################################################################
-######################################################################
-
-
-### TASK 1 & 4 #######################################################
-
-from fastapi.templating import Jinja2Templates
-from fastapi import Cookie, Request
-
-templates = Jinja2Templates(directory="templates")
-
-@app.get("/welcome")
-def do_welcome(request: Request, session_token: str = Cookie(None)):
-	if session_token not in app.session_tokens:
-		raise HTTPException(status_code=401, detail="Unathorised")
-	return templates.TemplateResponse("item.html", {"request": request, "user": "trudnY"})
-
-
-### TASK 2 ###########################################################
-from hashlib import sha256
-from starlette.responses import RedirectResponse
-from fastapi.security import HTTPBasic, HTTPBasicCredentials
-from fastapi import Depends, Response, status
-import secrets
-
-security = HTTPBasic()
-
-
-@app.post("/login")
-def get_current_user(response: Response, credentials: HTTPBasicCredentials = Depends(security)):
-    correct_username = secrets.compare_digest(credentials.username, "trudnY")
-    correct_password = secrets.compare_digest(credentials.password, "PaC13Nt")
-    if not (correct_username and correct_password):
-        raise HTTPException(status_code=401, detail="Incorrect email or password")
-    session_token = sha256(bytes(f"{credentials.username}{credentials.password}{app.secret_key}", encoding='utf8')).hexdigest()
-    app.session_tokens.append(session_token)
-    response.set_cookie(key="session_token", value=session_token)
-    response.headers["Location"] = "/welcome"
-    response.status_code = status.HTTP_302_FOUND 
-
-### TASK 3 ###########################################################
-
-@app.post("/logout")
-def logout(*, response: Response, session_token: str = Cookie(None)):
-	if session_token not in app.session_tokens:
-		raise HTTPException(status_code=401, detail="Unathorised")
-	app.session_tokens.remove(session_token)
-	return RedirectResponse("/")
