@@ -25,11 +25,10 @@ security = HTTPBasic()
 
 @app.get("/welcome/")
 def welcome(request: Request, session_token: str = Cookie(None)):
-    #if session_token not in app.tokens:
-    #    raise HTTPException(status_code = 401, detail = "Access denied")
-    #else:
-    #    return template.TemplateResponse("second.html", {"request": request, "user": "trudnY"})
-    return {"message": "finally someone let me out of my cage"}
+    if session_token not in app.tokens:
+        raise HTTPException(status_code = 401, detail = "Access denied")
+    else:
+        return template.TemplateResponse("second.html", {"request": request, "user": "trudnY"})
 
 @app.post("/login/")
 def login(response: Response, credentials: HTTPBasicCredentials = Depends(security)):
@@ -39,18 +38,13 @@ def login(response: Response, credentials: HTTPBasicCredentials = Depends(securi
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect email or password")
     session_token = sha256(bytes(f"{credentials.username}{credentials.password}{app.secret_key}", encoding='utf8')).hexdigest()
     app.tokens.append(session_token)
-    print(len(app.tokens))
     response.set_cookie(key = "session_token", value = session_token)
     return RedirectResponse(url = '/welcome')
 
 @app.post("/logout/")
 def logout(response: Response, session_token: str = Cookie(None)):
-    #if session_token not in app.tokens:
-    #    raise HTTPException(status_code = 401, detail = "Access denied")
-    #response.headers['Location'] = '/'
-    #response.status_code = status.HTTP_302_FOUND
-    print(len(app.tokens))
-    print(session_token)
+    if session_token not in app.tokens:
+        raise HTTPException(status_code = 401, detail = "Access denied")
     app.tokens.remove(session_token)
     return RedirectResponse(url = '/')
     
@@ -63,7 +57,8 @@ app.patients = []
 
 @app.get("/")
 def root():
-    return {"message": "Hello World during the coronavirus pandemic!"}
+    #return {"message": "Hello World during the coronavirus pandemic!"}
+    return {"message": "finally someone let me out of my cage"}
 
 @app.get("/method")
 def method_get():
