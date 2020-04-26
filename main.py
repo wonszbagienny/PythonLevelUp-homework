@@ -23,9 +23,9 @@ def login(credentials, response: Response):
         session_token = sha256(bytes(f"{credentials.user}{credentials.password}{app.secret_key}")).hexdigest()
         response.set_cookie(key = "session_token", value = session_token)
         app.tokens.append(session_token)
-        #response.status_code = 307
-        #response.headers['Location'] = "/welcome"
-        response = RedirectResponse(url = '/welcome')
+        response.status_code = 307
+        response.headers['Location'] = "/welcome"
+        #response = RedirectResponse(url = '/welcome')
         return response 
     else:
         raise HTTPException(status_code = 401, detail = "Invalid credentials")
