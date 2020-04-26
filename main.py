@@ -36,8 +36,9 @@ def login(response: Response, credentials: HTTPBasicCredentials = Depends(securi
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect email or password")
     session_token = sha256(bytes(f"{credentials.username}{credentials.password}{app.secret_key}", encoding='utf8')).hexdigest()
     app.tokens.append(session_token)
-    response = RedirectResponse(url = '/welcome')
-    response.set_cookie(key = "session_token", value = session_token)
+    return RedirectResponse(url = '/welcome')
+    #response = RedirectResponse(url = '/welcome')
+    #response.set_cookie(key = "session_token", value = session_token)
     #return RedirectResponse(url = '/welcome')
     #app.tokens.append(session_token)
     #response.status_code = status.HTTP_302_FOUND
@@ -48,9 +49,10 @@ def login(response: Response, credentials: HTTPBasicCredentials = Depends(securi
 def logout(response: Response, session_token = Cookie(None)):
     if session_token not in app.tokens:
         raise HTTPException(status_code = 401, detail = "Access denied")
-    response.headers['Location'] = '/'
-    response.status_code = status.HTTP_302_FOUND
+    #response.headers['Location'] = '/'
+    #response.status_code = status.HTTP_302_FOUND
     app.tokens.remove(session_token)
+    return RedirectResponse(url = '/')
     
 
 ###########################
