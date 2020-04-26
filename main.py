@@ -25,7 +25,8 @@ security = HTTPBasic()
 def welcome(request: Request, session_token = Cookie(None)):
     if session_token not in app.tokens:
         raise HTTPException(status_code = 401, detail = "Access denied")
-    return template.TemplateResponse("second.html", {"request": request, "user": "trudnY"})
+    else:
+        return template.TemplateResponse("second.html", {"request": request, "user": "trudnY"})
     #return {"message": "finally someone let me out of my cage"}
 
 @app.post("/login")
