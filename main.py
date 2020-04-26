@@ -30,7 +30,7 @@ def welcome(request: Request, session_token: str = Cookie(None)):
     else:
         return template.TemplateResponse("second.html", {"request": request, "user": "trudnY"})
 
-@app.post("/login")
+@app.post("/login/")
 def login(response: Response, credentials: HTTPBasicCredentials = Depends(security)):
     correct_username = secrets.compare_digest(credentials.username, "trudnY")
     correct_password = secrets.compare_digest(credentials.password, "PaC13Nt")
@@ -39,12 +39,12 @@ def login(response: Response, credentials: HTTPBasicCredentials = Depends(securi
     session_token = sha256(bytes(f"{credentials.username}{credentials.password}{app.secret_key}", encoding='utf8')).hexdigest()
     app.tokens.append(session_token)
     response.set_cookie(key = "session_token", value = session_token)
-    return RedirectResponse(url = '/welcome')
+    return RedirectResponse(url = '/welcome/')
 
-@app.post("/logout")
+@app.post("/logout/")
 def logout(response: Response, session_token: str = Cookie(None)):
-    if session_token not in app.tokens:
-        raise HTTPException(status_code = 401, detail = "Access denied")
+    #if session_token not in app.tokens:
+    #    raise HTTPException(status_code = 401, detail = "Access denied")
     app.tokens.remove(session_token)
     return RedirectResponse(url = '/')  
 
