@@ -39,7 +39,7 @@ def login(response: Response, credentials: HTTPBasicCredentials = Depends(securi
     response.set_cookie(key = "session_token", value = session_token)
     app.tokens.append(session_token)
     response.status_code = status.HTTP_302_FOUND
-    response.headers['Location'] = "/welcome"
+    #response.headers['Location'] = "/welcome"
     return response
     
 ###########################
