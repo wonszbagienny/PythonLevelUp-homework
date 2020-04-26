@@ -23,7 +23,8 @@ def login(credentials, response: Response):
         app.tokens.append(session_token)
         #response.status_code = 307
         #response.headers['Location'] = "/welcome"
-        return response = RedirectResponse(url='/welcome')
+        response = RedirectResponse(url='/welcome')
+        return response 
     else:
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
