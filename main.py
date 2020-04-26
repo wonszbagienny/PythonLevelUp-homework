@@ -32,8 +32,8 @@ def login(response: Response, credentials: HTTPBasicCredentials = Depends(securi
     app.tokens.append(session_token)
     response.status_code = 307
     response.headers['Location'] = "/welcome"
-    RedirectResponse(url = '/welcome')
-    return response
+    #RedirectResponse(url = '/welcome')
+    #return response
 
 @app.get("/welcome")
 def welcome(request: Request, session_token = Cookie(None)):
