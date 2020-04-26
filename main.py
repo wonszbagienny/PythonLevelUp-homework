@@ -36,6 +36,7 @@ def login(response: Response, credentials: HTTPBasicCredentials = Depends(securi
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect email or password")
     session_token = sha256(bytes(f"{credentials.username}{credentials.password}{app.secret_key}", encoding='utf8')).hexdigest()
     app.tokens.append(session_token)
+    response.set_cookie(key = "session_token", value = session_token)
     return RedirectResponse(url = '/welcome')
     #response = RedirectResponse(url = '/welcome')
     #response.set_cookie(key = "session_token", value = session_token)
