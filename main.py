@@ -35,9 +35,10 @@ def login(response: Response, credentials: HTTPBasicCredentials = Depends(securi
     if not (correct_username and correct_password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect email or password")
     session_token = sha256(bytes(f"{credentials.username}{credentials.password}{app.secret_key}", encoding='utf8')).hexdigest()
-    #response = RedirectResponse(url = '/welcome')
+    app.tokens.append(session_token)
+    response = RedirectResponse(url = '/welcome')
     response.set_cookie(key = "session_token", value = session_token)
-    RedirectResponse(url = '/welcome')
+    #return RedirectResponse(url = '/welcome')
     #app.tokens.append(session_token)
     #response.status_code = status.HTTP_302_FOUND
     #response.headers['Location'] = "/welcome"
@@ -50,6 +51,7 @@ def logout(response: Response, session_token = Cookie(None)):
     response.headers['Location'] = '/'
     response.status_code = status.HTTP_302_FOUND
     app.tokens.remove(session_token)
+    
 
 ###########################
 # first part [homework 1]
