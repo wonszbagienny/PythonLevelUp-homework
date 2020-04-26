@@ -1,5 +1,6 @@
 from hashlib import sha256
-from fastapi import FastAPI, HTTPException, Response, Cookie, Request, Depends, status
+from fastapi import FastAPI, HTTPException, Response, Request, Depends, status
+from fastapi import Cookie
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import JSONResponse
@@ -22,7 +23,7 @@ template = Jinja2Templates(directory = "templates")
 
 security = HTTPBasic()
 
-@app.get("/welcome")
+@app.get("/welcome/")
 def welcome(request: Request, session_token: str = Cookie(None)):
     #if session_token not in app.tokens:
     #    raise HTTPException(status_code = 401, detail = "Access denied")
@@ -30,7 +31,7 @@ def welcome(request: Request, session_token: str = Cookie(None)):
     #    return template.TemplateResponse("second.html", {"request": request, "user": "trudnY"})
     return {"message": "finally someone let me out of my cage"}
 
-@app.post("/login")
+@app.post("/login/")
 def login(response: Response, credentials: HTTPBasicCredentials = Depends(security)):
     correct_username = secrets.compare_digest(credentials.username, "trudnY")
     correct_password = secrets.compare_digest(credentials.password, "PaC13Nt")
@@ -42,7 +43,7 @@ def login(response: Response, credentials: HTTPBasicCredentials = Depends(securi
     response.set_cookie(key = "session_token", value = session_token)
     return RedirectResponse(url = '/welcome')
 
-@app.post("/logout")
+@app.post("/logout/")
 def logout(response: Response, session_token: str = Cookie(None)):
     #if session_token not in app.tokens:
     #    raise HTTPException(status_code = 401, detail = "Access denied")
