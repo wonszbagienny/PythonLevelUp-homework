@@ -18,10 +18,10 @@ app.users = {"trudnY": "PaC13Nt"}
 app.secret = "secret"
 app.tokens = []
 
-template = Jinja2Templates(directory = "templates")
+#template = Jinja2Templates(directory = "templates")
 
 @app.post("/login")
-def login(credentials: HTTPBasicCredentials = Depends(HTTPBasic()), response: Response):
+def login(response: Response, credentials: HTTPBasicCredentials = Depends(HTTPBasic())):
     if credentials.username in app.users and credentials.password == app.users[credentials.username]:
         session_token = sha256(bytes(f"{credentials.usename}{credentials.password}{app.secret_key}", encoding='utf8')).hexdigest()
         response.set_cookie(key = "session_token", value = session_token)
