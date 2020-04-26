@@ -50,8 +50,8 @@ def login(response: Response, credentials: HTTPBasicCredentials = Depends(securi
 
 @app.post("/logout")
 def logout(response: Response, session_token = Cookie(None)):
-    if session_token not in app.tokens:
-        raise HTTPException(status_code = 401, detail = "Access denied")
+    #if session_token not in app.tokens:
+    #    raise HTTPException(status_code = 401, detail = "Access denied")
     #response.headers['Location'] = '/'
     #response.status_code = status.HTTP_302_FOUND
     app.tokens.remove(session_token)
