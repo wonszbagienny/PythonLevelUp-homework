@@ -129,5 +129,7 @@ dmypy.json
 .pyre/
 
 # custom
-code/main_without_dict.py
+code/
 example-api-route.png
+szybkiskrypt.sh
+test_main.py

@@ -30,10 +30,10 @@ def login(response: Response, credentials: HTTPBasicCredentials = Depends(securi
     session_token = sha256(bytes(f"{credentials.usename}{credentials.password}{app.secret_key}", encoding='utf8')).hexdigest()
     response.set_cookie(key = "session_token", value = session_token)
     app.tokens.append(session_token)
-    response.status_code = 307
+    response.status_code = status.HTTP_302_FOUND
     response.headers['Location'] = "/welcome"
-    RedirectResponse(url = '/welcome')
-    return response
+    #RedirectResponse(url = '/welcome')
+    #return response
 
 @app.get("/welcome")
 def welcome(request: Request, session_token = Cookie(None)):
