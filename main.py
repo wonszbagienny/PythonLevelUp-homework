@@ -1,5 +1,7 @@
 from hashlib import sha256
-from fastapi import FastAPI, HTTPException, Response, Cookie
+from fastapi import FastAPI, HTTPException, Response, Cookie, Request, Depends
+from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from starlette.responses import RedirectResponse
 from typing import Dict
 from pydantic import BaseModel
 
@@ -18,25 +20,23 @@ app.tokens = []
 @app.post("/login")
 def login(credentials, response: Response):
     if credentials.username in app.users and credentials.password == app.users[credentials.username]:
-        session_token = sha256(bytes(f"{user}{password}{app.secret_key}")).hexdigest()
-        response.set_cookie(key="session_token", value=session_token)
+        session_token = sha256(bytes(f"{credentials.user}{credentials.password}{app.secret_key}")).hexdigest()
+        response.set_cookie(key = "session_token", value = session_token)
         app.tokens.append(session_token)
         #response.status_code = 307
         #response.headers['Location'] = "/welcome"
-        response = RedirectResponse(url='/welcome')
+        response = RedirectResponse(url = '/welcome')
         return response 
     else:
-        raise HTTPException(status_code=401, detail="Invalid credentials")
+        raise HTTPException(status_code = 401, detail = "Invalid credentials")
 
 @app.get("/welcome")
-def welcome():
-    if s_token in app.tokens:
-		return {"message": "finally someone let me out of my cage"}
+def welcome(request: Request, session_token = Cookie(None)):
+    if session_token in app.tokens:
+        return {"message": "finally someone let me out of my cage"}
     else:
-        raise HTTPException(status_code=401, detail="dostęp wzbroniony")
+        raise HTTPException(status_code = 401, detail = "Access denied")
     
-
-@app.post("/login")
 
 ###########################
 # first part [homework 1]
