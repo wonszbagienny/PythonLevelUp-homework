@@ -39,12 +39,12 @@ def login(response: Response, credentials: HTTPBasicCredentials = Depends(securi
     session_token = sha256(bytes(f"{credentials.username}{credentials.password}{app.secret_key}", encoding='utf8')).hexdigest()
     app.tokens.append(session_token)
     response.set_cookie(key = "session_token", value = session_token)
-    #response.headers["Location"] = "/welcome"
-    #response.status_code = status.HTTP_302_FOUND 
-    return RedirectResponse(url = '/welcome')
+    response.headers["Location"] = "/welcome"
+    response.status_code = status.HTTP_302_FOUND 
+    #return RedirectResponse(url = '/welcome')
 
 @app.post("/logout")
-def logout(*, response: Response, session_token: str = Cookie(None)):
+def logout(response: Response, session_token: str = Cookie(None)):
     if session_token not in app.tokens:
         raise HTTPException(status_code = 401, detail = "Access denied")
     app.tokens.remove(session_token)
