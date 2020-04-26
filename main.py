@@ -46,7 +46,9 @@ def logout(response: Response, session_token: str = Cookie(None)):
     if session_token not in app.tokens:
         raise HTTPException(status_code = 401, detail = "Access denied")
     app.tokens.remove(session_token)
-    return RedirectResponse(url = '/')
+    #return RedirectResponse(url = '/')
+    response.status_code = status.HTTP_302_FOUND
+    response.headers["Location"] = "/"
     
 
 ###########################
