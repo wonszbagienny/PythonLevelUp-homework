@@ -41,12 +41,12 @@ def login(response: Response, credentials: HTTPBasicCredentials = Depends(securi
     response.set_cookie(key = "session_token", value = session_token)
     return RedirectResponse(url = '/welcome/')
 
-@app.post("/logout")
+@app.post("/logout/")
 def logout(response: Response, session_token: str = Cookie(None)):
     #if session_token not in app.tokens:
     #    raise HTTPException(status_code = 401, detail = "Access denied")
     app.tokens.remove(session_token)
-    return RedirectResponse(url = '/')  
+    return RedirectResponse('/')  
 
 ###########################
 # first part [homework 1]
