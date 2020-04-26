@@ -17,7 +17,7 @@ app.num = 0
 app.count = -1
 app.tokens = []
 
-#template = Jinja2Templates(directory = "templates")
+template = Jinja2Templates(directory = "templates")
 
 security = HTTPBasic()
 
@@ -32,15 +32,15 @@ def login(response: Response, credentials: HTTPBasicCredentials = Depends(securi
     app.tokens.append(session_token)
     response.status_code = 307
     response.headers['Location'] = "/welcome"
-    #RedirectResponse(url = '/welcome')
-    #return response
+    RedirectResponse(url = '/welcome')
+    return response
 
 @app.get("/welcome")
 def welcome(request: Request, session_token = Cookie(None)):
     if session_token not in app.tokens:
         raise HTTPException(status_code = 401, detail = "Access denied")
-    #return template.TemplateResponse("second.html", {"request": request, "user": "trudnY"})
-    return {"message": "finally someone let me out of my cage"}
+    return template.TemplateResponse("second.html", {"request": request, "user": "trudnY"})
+    #return {"message": "finally someone let me out of my cage"}
         
     
 
