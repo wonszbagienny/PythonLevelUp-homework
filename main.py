@@ -1,6 +1,7 @@
 from hashlib import sha256
 from fastapi import FastAPI, HTTPException, Response, Cookie, Request, Depends
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
+from fastapi.templating import Jinja2Templates
 from starlette.responses import RedirectResponse
 from typing import Dict
 from pydantic import BaseModel
@@ -17,15 +18,17 @@ app.users = {"trudnY": "PaC13Nt"}
 app.secret = "secret"
 app.tokens = []
 
+#template = Jinja2Templates(directory = "templates")
+
 @app.post("/login")
 def login(credentials, response: Response):
     if credentials.username in app.users and credentials.password == app.users[credentials.username]:
-        session_token = sha256(bytes(f"{credentials.user}{credentials.password}{app.secret_key}")).hexdigest()
+        session_token = sha256(bytes(f"{credentials.usename}{credentials.password}{app.secret_key}", encoding='utf8')).hexdigest()
         response.set_cookie(key = "session_token", value = session_token)
         app.tokens.append(session_token)
         response.status_code = 307
         response.headers['Location'] = "/welcome"
-        #response = RedirectResponse(url = '/welcome')
+        RedirectResponse(url = '/welcome')
         return response 
     else:
         raise HTTPException(status_code = 401, detail = "Invalid credentials")
@@ -33,6 +36,7 @@ def login(credentials, response: Response):
 @app.get("/welcome")
 def welcome(request: Request, session_token = Cookie(None)):
     if session_token in app.tokens:
+        #return template.TemplateResponse("second.html", {"request": request, "user": "trudnY"})
         return {"message": "finally someone let me out of my cage"}
     else:
         raise HTTPException(status_code = 401, detail = "Access denied")
