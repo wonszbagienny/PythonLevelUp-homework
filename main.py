@@ -18,7 +18,7 @@ app.users = {"trudnY": "PaC13Nt"}
 app.secret = "secret"
 app.tokens = []
 
-#template = Jinja2Templates(directory = "templates")
+template = Jinja2Templates(directory = "templates")
 
 @app.post("/login")
 def login(credentials, response: Response):
@@ -35,11 +35,11 @@ def login(credentials, response: Response):
 
 @app.get("/welcome")
 def welcome(request: Request, session_token = Cookie(None)):
-    if session_token in app.tokens:
-        #return template.TemplateResponse("second.html", {"request": request, "user": "trudnY"})
-        return {"message": "finally someone let me out of my cage"}
-    else:
+    if session_token not in app.tokens:
         raise HTTPException(status_code = 401, detail = "Access denied")
+    #return template.TemplateResponse("second.html", {"request": request, "user": "trudnY"})
+    return {"message": "finally someone let me out of my cage"}
+        
     
 
 ###########################
