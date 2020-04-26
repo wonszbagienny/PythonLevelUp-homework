@@ -1,10 +1,11 @@
 from hashlib import sha256
-from fastapi import FastAPI, HTTPException, Response, Cookie, Request, Depends
+from fastapi import FastAPI, HTTPException, Response, Cookie, Request, Depends, status
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.templating import Jinja2Templates
 from starlette.responses import RedirectResponse
 from typing import Dict
 from pydantic import BaseModel
+import secrets
 
 app = FastAPI()
 
@@ -14,24 +15,25 @@ app = FastAPI()
 app.secret_key = "very constant and random secret, best 64 characters"
 app.num = 0
 app.count = -1
-app.users = {"trudnY": "PaC13Nt"}
-app.secret = "secret"
 app.tokens = []
 
 #template = Jinja2Templates(directory = "templates")
 
+security = HTTPBasic()
+
 @app.post("/login")
-def login(response: Response, credentials: HTTPBasicCredentials = Depends(HTTPBasic())):
-    if credentials.username in app.users and credentials.password == app.users[credentials.username]:
-        session_token = sha256(bytes(f"{credentials.usename}{credentials.password}{app.secret_key}", encoding='utf8')).hexdigest()
-        response.set_cookie(key = "session_token", value = session_token)
-        app.tokens.append(session_token)
-        response.status_code = 307
-        response.headers['Location'] = "/welcome"
-        RedirectResponse(url = '/welcome')
-        return response 
-    else:
-        raise HTTPException(status_code = 401, detail = "Invalid credentials")
+def login(response: Response, credentials: HTTPBasicCredentials = Depends(security)):
+    correct_username = secrets.compare_digest(credentials.username, "trudnY")
+    correct_password = secrets.compare_digest(credentials.password, "PaC13Nt")
+    if not (correct_username and correct_password):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Incorrect email or password")
+    session_token = sha256(bytes(f"{credentials.usename}{credentials.password}{app.secret_key}", encoding='utf8')).hexdigest()
+    response.set_cookie(key = "session_token", value = session_token)
+    app.tokens.append(session_token)
+    response.status_code = 307
+    response.headers['Location'] = "/welcome"
+    RedirectResponse(url = '/welcome')
+    return response
 
 @app.get("/welcome")
 def welcome(request: Request, session_token = Cookie(None)):
@@ -70,7 +72,7 @@ def method_delete():
 
 class GiveMeSomethingRq(BaseModel):
     name: str
-    surename: str
+    surname: str
 
 class GiveMeSomethingResp(BaseModel):
     id: int = app.no_of_patients
