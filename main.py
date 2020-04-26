@@ -2,6 +2,7 @@ from hashlib import sha256
 from fastapi import FastAPI, HTTPException, Response, Cookie, Request, Depends, status
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.templating import Jinja2Templates
+from fastapi.responses import JSONResponse
 from starlette.responses import RedirectResponse
 from typing import Dict
 from pydantic import BaseModel
@@ -23,11 +24,11 @@ security = HTTPBasic()
 
 @app.get("/welcome")
 def welcome(request: Request, session_token = Cookie(None)):
-    if session_token not in app.tokens:
-        raise HTTPException(status_code = 401, detail = "Access denied")
-    else:
-        return template.TemplateResponse("second.html", {"request": request, "user": "trudnY"})
-    #return {"message": "finally someone let me out of my cage"}
+    #if session_token not in app.tokens:
+    #    raise HTTPException(status_code = 401, detail = "Access denied")
+    #else:
+    #    return template.TemplateResponse("second.html", {"request": request, "user": "trudnY"})
+    return {"message": "finally someone let me out of my cage"}
 
 @app.post("/login")
 def login(response: Response, credentials: HTTPBasicCredentials = Depends(security)):
