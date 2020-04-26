@@ -23,7 +23,7 @@ template = Jinja2Templates(directory = "templates")
 
 security = HTTPBasic()
 
-@app.get("/welcome")
+@app.get("/welcome/")
 def welcome(request: Request, session_token: str = Cookie(None)):
     if session_token not in app.tokens:
         raise HTTPException(status_code = 401, detail = "Access denied")
