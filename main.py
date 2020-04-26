@@ -1,18 +1,51 @@
-from fastapi import FastAPI, HTTPException
+from hashlib import sha256
+from fastapi import FastAPI, HTTPException, Response, Cookie
 from typing import Dict
 from pydantic import BaseModel
 
 app = FastAPI()
+
+###########################
+# second part [homework 3]
+
+app.secret_key = "very constant and random secret, best 64 characters"
+app.num = 0
+app.count = -1
+app.users = {"trudnY": "PaC13Nt"}
+app.secret = "secret"
+app.tokens = []
+
+@app.post("/login")
+def login(credentials, response: Response):
+    if credentials.username in app.users and credentials.password == app.users[credentials.username]:
+        session_token = sha256(bytes(f"{user}{password}{app.secret_key}")).hexdigest()
+        response.set_cookie(key="session_token", value=session_token)
+        app.tokens.append(session_token)
+        #response.status_code = 307
+        #response.headers['Location'] = "/welcome"
+        return response = RedirectResponse(url='/welcome')
+    else:
+        raise HTTPException(status_code=401, detail="Invalid credentials")
+
+@app.get("/welcome")
+def welcome():
+    if s_token in app.tokens:
+		return template.TemplateResponse("template1.html", {"request": request, "user": "trudnY" }
+    else:
+        raise HTTPException(status_code=401, detail="dostęp wzbroniony")
+    return {"message": "finally someone let me out of my cage"}
+
+@app.post("/login")
+
+###########################
+# first part [homework 1]
+
 app.no_of_patients = 0
 app.patients = []
 
 @app.get("/")
 def root():
     return {"message": "Hello World during the coronavirus pandemic!"}
-
-@app.get("/welcome")
-def welcome():
-    return {"message": "finally someone let me out of my cage"}
 
 @app.get("/method")
 def method_get():
@@ -55,3 +88,4 @@ def get_patient(pk: int):
         return app.patients[pk]
     else:
         raise HTTPException(status_code = 204, detail = "patient_not_found")
+
