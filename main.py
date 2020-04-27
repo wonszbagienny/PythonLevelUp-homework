@@ -27,8 +27,7 @@ security = HTTPBasic()
 def welcome(request: Request, session_token: str = Cookie(None)):
     if session_token not in app.tokens:
         raise HTTPException(status_code = 401, detail = "Access denied")
-    else:
-        return template.TemplateResponse("second.html", {"request": request, "user": "trudnY"})
+    return template.TemplateResponse("second.html", {"request": request, "user": "trudnY"})
 
 @app.post("/login")
 def login(response: Response, credentials: HTTPBasicCredentials = Depends(security)):
@@ -39,9 +38,8 @@ def login(response: Response, credentials: HTTPBasicCredentials = Depends(securi
     session_token = sha256(bytes(f"{credentials.username}{credentials.password}{app.secret_key}", encoding='utf8')).hexdigest()
     app.tokens.append(session_token)
     response.set_cookie(key = "session_token", value = session_token)
-    #response.headers["Location"] = "/welcome"
-    #response.status_code = status.HTTP_302_FOUND 
-    return RedirectResponse('/welcome')
+    response.headers["Location"] = "/welcome"
+    response.status_code = status.HTTP_302_FOUND 
 
 @app.post("/logout")
 def logout(response: Response, session_token: str = Cookie(None)):
