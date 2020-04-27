@@ -91,6 +91,7 @@ def kill_patient(ID: int, session_token: str = Cookie(None)):
     if session_token not in app.tokens:
         raise HTTPException(status_code = 401, detail = "Access Denied")
     if (len(app.patients) > ID and ID >= 0):
+        print(app.patients)
         app.patients.remove(ID)
     else:
         raise HTTPException(status_code = 204, detail = "patient_not_found")
