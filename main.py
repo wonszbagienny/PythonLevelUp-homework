@@ -90,7 +90,7 @@ def kill_patient(ID: int, session_token: str = Cookie(None)):
         raise HTTPException(status_code = 401, detail = "Access Denied")
     if (len(app.patients) > ID and ID >= 0):
         print(app.patients)
-        app.patients.pop(app.patients[ID])
+        app.patients.pop(ID)
     raise HTTPException(status_code = 204, detail = "patient_not_found")
 
 ###########################
