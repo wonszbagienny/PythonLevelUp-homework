@@ -67,24 +67,24 @@ def impatient(response: Response, rq: GiveMeSomethingRq, session_token: str = Co
 
 @app.get("/patient/{ID}")
 def show_patient(ID: int, session_token: str = Cookie(None)):
-	if session_token not in app.tokens:
-		raise HTTPException(status_code = 401, detail = "Access Denied")
+    if session_token not in app.tokens:
+       raise HTTPException(status_code = 401, detail = "Access Denied")
     if len(app.patients) > ID and ID >= 0:
         return app.patient_list[ID]
-        #return JSONResponse(app.patient_list[ID])
     else:
         raise HTTPException(status_code = 204, detail = "patient_not_found")
+    return JSONResponse(app.patient_list[ID])
 
 @app.get("/patient")
 def show_patients(session_token: str = Cookie(None)):
     if session_token not in app.tokens:
-		raise HTTPException(status_code = 401, detail = "Access Denied")
+        raise HTTPException(status_code = 401, detail = "Access Denied")
     return JSONResponse(app.patient_list)
 
 @app.delete("/patient/{ID}")
-def kill_patient(session_token: str = Cookie(None))
+def kill_patient(ID: int, session_token: str = Cookie(None)):
     if session_token not in app.tokens:
-		raise HTTPException(status_code = 401, detail = "Access Denied")
+        raise HTTPException(status_code = 401, detail = "Access Denied")
     if (len(app.patients) > ID and ID >= 0):
         app.patients.remove(ID)
     else:
