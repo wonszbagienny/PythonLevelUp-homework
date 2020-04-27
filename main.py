@@ -11,12 +11,19 @@ import secrets
 
 app = FastAPI()
 
+class GiveMeSomethingRq(BaseModel):
+    name: str
+    surname: str
+
+
+class GiveMeSomethingResp(BaseModel):
+    id: int = app.no_of_patients
+    patient: Dict
+
 ###########################
 # second part [homework 3]
 
 app.secret_key = "very constant and random secret, best 64 characters"
-app.num = 0
-app.count = -1
 app.tokens = []
 
 template = Jinja2Templates(directory = "templates")
@@ -48,6 +55,41 @@ def logout(response: Response, session_token: str = Cookie(None)):
     app.tokens.remove(session_token)
     return RedirectResponse("/")
 
+@app.post("/patient")
+def impatient(response: Response, rq: GiveMeSomethingRq, session_token: str = Cookie(None)):
+    if session_token not in app.tokens:
+        raise HTTPException(status_code = 401, detail = "Access denied")
+    ID = app.no_of_patients
+    app.patients.append(rq.dict())
+    app.no_of_patients += 1
+    response.status_code = status.HTTP_302_FOUND
+    response.headers["Location"] = f"/patient/{ID}"
+
+@app.get("/patient/{ID}")
+def show_patient(ID: int, session_token: str = Cookie(None)):
+	if session_token not in app.tokens:
+		raise HTTPException(status_code = 401, detail = "Access Denied")
+    if (len(app.patients) > ID and ID >= 0):
+        #return JSONResponse(app.patient_list[ID])
+        return app.patient_list[ID]
+    else:
+        raise HTTPException(status_code = 204, detail = "patient_not_found")
+
+@app.get("/patient")
+def show_patients(session_token: str = Cookie(None)):
+    if session_token not in app.tokens:
+		raise HTTPException(status_code = 401, detail = "Access Denied")
+    return JSONResponse(app.patient_list)
+
+@app.delete("/patient/{ID}")
+def kill_patient(session_token: str = Cookie(None))
+    if session_token not in app.tokens:
+		raise HTTPException(status_code = 401, detail = "Access Denied")
+    if (len(app.patients) > ID and ID >= 0):
+        app.patients.remove(ID)
+    else:
+        raise HTTPException(status_code = 204, detail = "patient_not_found")
+
 ###########################
 # first part [homework 1]
 
@@ -73,14 +115,6 @@ def method_put():
 @app.delete("/method")
 def method_delete():
     return {"method": "DELETE"}
-
-class GiveMeSomethingRq(BaseModel):
-    name: str
-    surname: str
-
-class GiveMeSomethingResp(BaseModel):
-    id: int = app.no_of_patients
-    patient: Dict
 
 @app.post("/patient", response_model=GiveMeSomethingResp)
 def post_patient(rq: GiveMeSomethingRq):
