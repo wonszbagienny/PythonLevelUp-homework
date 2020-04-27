@@ -12,7 +12,7 @@ import secrets
 app = FastAPI()
 
 app.no_of_patients = 0
-app.patients = []
+app.patients = {}
 
 class GiveMeSomethingRq(BaseModel):
     name: str
@@ -63,7 +63,7 @@ def impatient(response: Response, rq: GiveMeSomethingRq, session_token: str = Co
     if session_token not in app.tokens:
         raise HTTPException(status_code = 401, detail = "Access denied")
     ID = app.no_of_patients
-    app.patients.append(rq.dict())
+    app.patients[ID] = rq.dict()
     app.no_of_patients += 1
     response.status_code = status.HTTP_302_FOUND
     response.headers["Location"] = f"/patient/{ID}"
