@@ -11,6 +11,9 @@ import secrets
 
 app = FastAPI()
 
+app.no_of_patients = 0
+app.patients = []
+
 class GiveMeSomethingRq(BaseModel):
     name: str
     surname: str
@@ -92,9 +95,6 @@ def kill_patient(ID: int, session_token: str = Cookie(None)):
 
 ###########################
 # first part [homework 1]
-
-app.no_of_patients = 0
-app.patients = []
 
 @app.get("/")
 def root():
