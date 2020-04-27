@@ -116,21 +116,21 @@ def method_put():
 def method_delete():
     return {"method": "DELETE"}
 
-@app.post("/patient", response_model=GiveMeSomethingResp)
-def post_patient(rq: GiveMeSomethingRq):
-    returnID = app.no_of_patients
-    app.patients.append(rq.dict())
-    app.no_of_patients += 1
-    return GiveMeSomethingResp(id=returnID, patient=rq.dict())
+#@app.post("/patient", response_model=GiveMeSomethingResp)
+#def post_patient(rq: GiveMeSomethingRq):
+#    returnID = app.no_of_patients
+#    app.patients.append(rq.dict())
+#    app.no_of_patients += 1
+#    return GiveMeSomethingResp(id=returnID, patient=rq.dict())
 
 @app.get("/number_of_patients")
 def get_number():
     return str(app.no_of_patients)
 
-@app.get("/patient/{pk}")
-def get_patient(pk: int):
-    if (len(app.patients) > pk and pk >= 0):
-        return app.patients[pk]
-    else:
-        raise HTTPException(status_code = 204, detail = "patient_not_found")
+#@app.get("/patient/{pk}")
+#def get_patient(pk: int):
+#    if (len(app.patients) > pk and pk >= 0):
+#        return app.patients[pk]
+#    else:
+#        raise HTTPException(status_code = 204, detail = "patient_not_found")
 
