@@ -75,7 +75,6 @@ def show_patient(ID: int, session_token: str = Cookie(None)):
     if len(app.patients) > ID and ID >= 0:
         return app.patients[ID]
     raise HTTPException(status_code = 204, detail = "patient_not_found")
-    #return JSONResponse(app.patient_list[ID])
 
 @app.get("/patient")
 def show_patients(session_token: str = Cookie(None)):
@@ -91,7 +90,7 @@ def kill_patient(ID: int, session_token: str = Cookie(None)):
         raise HTTPException(status_code = 401, detail = "Access Denied")
     if (len(app.patients) > ID and ID >= 0):
         print(app.patients)
-        app.patients.remove(app.patients[ID])
+        app.patients.pop(app.patients[ID])
     raise HTTPException(status_code = 204, detail = "patient_not_found")
 
 ###########################
