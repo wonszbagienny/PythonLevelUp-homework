@@ -74,15 +74,17 @@ def show_patient(ID: int, session_token: str = Cookie(None)):
        raise HTTPException(status_code = 401, detail = "Access Denied")
     if len(app.patients) > ID and ID >= 0:
         return app.patient_list[ID]
-    else:
-        raise HTTPException(status_code = 204, detail = "patient_not_found")
-    return JSONResponse(app.patient_list[ID])
+    raise HTTPException(status_code = 204, detail = "patient_not_found")
+    #return JSONResponse(app.patient_list[ID])
 
 @app.get("/patient")
 def show_patients(session_token: str = Cookie(None)):
     if session_token not in app.tokens:
         raise HTTPException(status_code = 401, detail = "Access Denied")
-    return JSONResponse(app.patient_list)
+    if len(app.patients) != 0:
+        return app.patients
+    raise HTTPException(status_code = 204, detail = "No patients to show")
+   # return JSONResponse(app.patient_list)
 
 @app.delete("/patient/{ID}")
 def kill_patient(ID: int, session_token: str = Cookie(None)):
