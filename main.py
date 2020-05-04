@@ -1,3 +1,4 @@
+import aiosqlite
 from hashlib import sha256
 from fastapi import FastAPI, HTTPException, Response, Request, Depends, status
 from fastapi import Cookie
@@ -9,10 +10,21 @@ from typing import Dict
 from pydantic import BaseModel
 import secrets
 
+from . import database as db
+from .routers import tracks
+
 app = FastAPI()
+app.include_router(tracks.router)
 
 app.no_of_patients = 0
 app.patients = {}
+
+app.secret_key = "very constant and random secret, best 64 characters"
+app.tokens = []
+
+template = Jinja2Templates(directory = "templates")
+
+security = HTTPBasic()
 
 class GiveMeSomethingRq(BaseModel):
     name: str
@@ -24,14 +36,25 @@ class GiveMeSomethingResp(BaseModel):
     patient: Dict
 
 ###########################
+# third part [homework 4]
+
+@app.on_event("startup")
+async def startup():
+    db.DATABASE_CONNECTION = await aiosqlite.connect(db.SQL_DATABASE_ADDRESS)
+
+@app.on_event("shutdown")
+async def shutdown():
+    await db.DATABASE_CONNECTION.close()
+
+@app.get("/customers")
+async def customers(db_connection: aiosqlite.Connection = Depends(db.get_db_conn)):
+    db_connection.row_factory = aiosqlite.Row
+    cursor = await db_connection.execute("SELECT Email FROM customers")
+    data = await cursor.fetchall()
+    return data
+
+###########################
 # second part [homework 3]
-
-app.secret_key = "very constant and random secret, best 64 characters"
-app.tokens = []
-
-template = Jinja2Templates(directory = "templates")
-
-security = HTTPBasic()
 
 @app.get("/welcome")
 def welcome(request: Request, session_token: str = Cookie(None)):
