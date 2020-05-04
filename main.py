@@ -5,8 +5,8 @@ from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import JSONResponse
 from starlette.responses import RedirectResponse
-from typing import Dict
 from pydantic import BaseModel
+from typing import Dict
 import secrets
 
 import database as db
