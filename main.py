@@ -1,4 +1,3 @@
-import aiosqlite
 from hashlib import sha256
 from fastapi import FastAPI, HTTPException, Response, Request, Depends, status
 from fastapi import Cookie
