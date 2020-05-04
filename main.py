@@ -34,7 +34,7 @@ class GiveMeSomethingRq(BaseModel):
 class GiveMeSomethingResp(BaseModel):
     id: int = app.no_of_patients
     patient: Dict
-
+    
 ###########################
 # third part [homework 4]
 
@@ -45,13 +45,6 @@ async def startup():
 @app.on_event("shutdown")
 async def shutdown():
     await db.DATABASE_CONNECTION.close()
-
-@app.get("/customers")
-async def customers(db_connection: aiosqlite.Connection = Depends(db.get_db_conn)):
-    db_connection.row_factory = aiosqlite.Row
-    cursor = await db_connection.execute("SELECT Email FROM customers")
-    data = await cursor.fetchall()
-    return data
 
 ###########################
 # second part [homework 3]
