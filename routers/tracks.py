@@ -1,7 +1,7 @@
 import aiosqlite
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
-from ..database import get_db_conn
+from database import get_db_conn
 
 router = APIRouter()
 

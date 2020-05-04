@@ -9,8 +9,8 @@ from typing import Dict
 from pydantic import BaseModel
 import secrets
 
-from . import database as db
-from .routers import tracks
+import database as db
+from routers import tracks
 
 app = FastAPI()
 app.include_router(tracks.router)
