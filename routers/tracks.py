@@ -10,7 +10,7 @@ router = APIRouter()
 
 @router.on_event("startup")
 async def startup():
-    router.db_connection = await aiosqlite.connect('databases/chinook.db')
+    router.db_connection = await aiosqlite.connect('chinook.db')
 
 @router.on_event("shutdown")
 async def shutdown():
