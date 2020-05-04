@@ -1,14 +1,19 @@
-from fastapi import APIRouter, Depends
-from starlette.responses import RedirectResponse
+from fastapi import APIRouter, Response, status
 from pydantic import BaseModel
-from typing import Dict
-from database import get_db_conn
 import aiosqlite
 
 router = APIRouter()
 
 ###########################
 # third part [homework 4]
+
+@app.on_event("startup")
+async def startup():
+    router.db_connection = await aiosqlite.connect('databases/chinook.db')
+
+@app.on_event("shutdown")
+async def shutdown():
+    await router.db_connection.close()
 
 class Track(BaseModel):
     TrackId: int
@@ -21,9 +26,10 @@ class Track(BaseModel):
     Bytes: int
     UnitPrice: float
 
-@router.get("/tracks")
+@router.get("/tracks", response_model=List[Track])
 async def tracks(connection: aiosqlite.Connection = Depends(get_db_conn), page: int = 0, per_page: int = 10):
-    cursor = await connection.execute("SELECT * FROM tracks ORDER BY trackid LIMIT ? OFFSET ?;", (per_page, page * per_page))
+    router.db_connection.row_factory = aiosqlite.Row
+    cursor = await router.dob_connection.execute("SELECT * FROM tracks ORDER BY trackid LIMIT ? OFFSET ?;", (per_page, page * per_page))
     data = await cursor.fetchall()
     return data
 

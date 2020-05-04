@@ -3,13 +3,11 @@ from fastapi import FastAPI, HTTPException, Response, Request, Depends, status
 from fastapi import Cookie
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
 from fastapi.templating import Jinja2Templates
-from fastapi.responses import JSONResponse
 from starlette.responses import RedirectResponse
 from pydantic import BaseModel
 from typing import Dict
 import secrets
 
-import database as db
 from routers import tracks
 
 app = FastAPI()
@@ -33,17 +31,7 @@ class GiveMeSomethingRq(BaseModel):
 class GiveMeSomethingResp(BaseModel):
     id: int = app.no_of_patients
     patient: Dict
-    
-###########################
-# third part [homework 4]
 
-@app.on_event("startup")
-async def startup():
-    db.DATABASE_CONNECTION = await aiosqlite.connect(db.SQL_DATABASE_ADDRESS)
-
-@app.on_event("shutdown")
-async def shutdown():
-    await db.DATABASE_CONNECTION.close()
 
 ###########################
 # second part [homework 3]
