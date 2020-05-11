@@ -49,8 +49,8 @@ class Album(BaseModel):
 
 class AlbumResponse(BaseModel):
     AlbumId: int
-    title: str
-    artist_id: int
+    Title: str
+    ArtistId: int
 
 @router.post("/albums", status_code=201, response_model=AlbumResponse)
 async def post_album(request: Album):
@@ -60,12 +60,11 @@ async def post_album(request: Album):
         raise HTTPException(status_code=404, detail={"error": "artist_id not found"})
     cursor = await router.db_connection.execute("INSERT INTO albums (Title, ArtistId) VALUES (?, ?);", (request.title, request.artist_id))
     await router.db_connection.commit()
-    return AlbumResponse(AlbumId = cursor.lastrowid, title = request.title, artist_id = request.artist_id)
-    #return {"AlbumId": cursor.lastrowid, "Title": request.title, "ArtistId": request.artist_id}
+    return AlbumResponse(AlbumId = cursor.lastrowid, Title = request.title, ArtistID = request.artist_id)
 
 @router.get("/albums/{album_id}", status_code=200)
 async def get_album(album_id: int):
-    router.db_connection.row_factory = lambda cursor, x: x[0]
+    router.db_connection.row_factory = aiosqlite.Row
     cursor = await router.db_connection.execute("SELECT * FROM albums WHERE AlbumId = ?;", (album_id,))
     album = await cursor.fetchone()
     if not album:
