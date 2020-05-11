@@ -54,7 +54,8 @@ class AlbumResponse(BaseModel):
 
 @router.post("/albums", status_code=201, response_model=AlbumResponse)
 async def post_album(request: Album):
-    check = await router.db_connection.execute("SELECT ArtistId FROM artists WHERE ArtistId = ?;", (request.artist_id,)).fetchone()
+    cursor = await router.db_connection.execute("SELECT ArtistId FROM artists WHERE ArtistId = ?;", (request.artist_id,))
+    check = await cursor.fetchone()
     if not check:
         raise HTTPException(status_code=404, detail={"error": "artist_id not found"})
     cursor = await router.db_connection.execute("INSERT INTO albums (Title, ArtistId) VALUES (?, ?);", (request.title, request.artist_id))
@@ -64,8 +65,9 @@ async def post_album(request: Album):
 
 @router.get("/albums/{album_id}", status_code=200)
 async def get_album(album_id: int):
-    app.db_connection.row_factory = lambda cursor, x: x[0]
-    album = await router.db_connection.execute("SELECT * FROM albums WHERE AlbumId = ?;", (album_id,)).fetchone()
+    router.db_connection.row_factory = lambda cursor, x: x[0]
+    cursor = await router.db_connection.execute("SELECT * FROM albums WHERE AlbumId = ?;", (album_id,))
+    album = cursor.fetchone()
     if not album:
         raise HTTPException(status_code=404, detail={"error": "artist_id not found"})
     return album
