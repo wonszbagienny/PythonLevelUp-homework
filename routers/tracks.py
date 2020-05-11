@@ -34,9 +34,9 @@ async def tracks(page: int = 0, per_page: int = 10):
     data = await cursor.fetchall()
     return data
 
-@router.get("/tracks/composers")
+@router.get("/tracks/composers/")
 async def composers(composer_name: str):
-    db_connection.row_factory = aiosqlite.Row
+    db_connection.row_factory = lambda cursor, x: x[0]
     cursor = await db_connection.execute("SELECT Name FROM tracks WHERE Composer = ?", (composer_name))
     data = await cursor.fetchall()
     if len(data) == 0:
