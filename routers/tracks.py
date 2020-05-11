@@ -34,9 +34,11 @@ async def tracks(page: int = 0, per_page: int = 10):
     data = await cursor.fetchall()
     return data
 
-#@router.get("/customers")
-#async def customers():
-#    db_connection.row_factory = aiosqlite.Row
-#    cursor = await db_connection.execute("SELECT Email FROM customers")
-#    data = await cursor.fetchall()
-#    return data
+@router.get("/tracks/composers")
+async def composers(composer_name: str):
+    db_connection.row_factory = aiosqlite.Row
+    cursor = await db_connection.execute("SELECT Name FROM tracks WHERE Composer = ?", (composer_name))
+    data = await cursor.fetchall()
+    if len(data) == 0:
+        raise HTTPException(status_code=404, detail="error")
+    return data
