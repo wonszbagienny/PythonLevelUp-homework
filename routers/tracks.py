@@ -67,7 +67,7 @@ async def post_album(request: Album):
 async def get_album(album_id: int):
     router.db_connection.row_factory = lambda cursor, x: x[0]
     cursor = await router.db_connection.execute("SELECT * FROM albums WHERE AlbumId = ?;", (album_id,))
-    album = cursor.fetchone()
+    album = await cursor.fetchone()
     if not album:
         raise HTTPException(status_code=404, detail={"error": "artist_id not found"})
     return album
