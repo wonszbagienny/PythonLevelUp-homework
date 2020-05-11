@@ -62,7 +62,7 @@ async def post_album(request: Album):
     #return AlbumResponse(AlbumId = cursor.lastrowid, title = request.title, artist_id = request.artist_id)
     return {"AlbumId": cursor.lastrowid, "Title": request.title, "ArtistId": request.artist_id}
 
-@router.get("/albums/{album_id}", response_model=AlbumResponse, status_code=200)
+@router.get("/albums/{album_id}", status_code=200)
 async def get_album(album_id: int):
     app.db_connection.row_factory = lambda cursor, x: x[0]
     album = router.db_connection.execute("SELECT * FROM albums WHERE AlbumId = ?;", (album_id,)).fetchone()
