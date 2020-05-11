@@ -39,6 +39,6 @@ async def composers(composer_name: str):
     router.db_connection.row_factory = lambda cursor, x: x[0]
     cursor = await router.db_connection.execute("SELECT Name FROM tracks WHERE Composer = ? ORDER BY Name;", (composer_name,))
     data = await cursor.fetchall()
-    if len(data) == 0:
+    if not data:
         raise HTTPException(status_code=404, detail="error")
     return data
