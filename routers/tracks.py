@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Response, status, HTTPException
 from pydantic import BaseModel
-from typing import List
+from typing import List, Dict
 import aiosqlite
 
 router = APIRouter()
@@ -37,8 +37,34 @@ async def tracks(page: int = 0, per_page: int = 10):
 @router.get("/tracks/composers/")
 async def composers(composer_name: str):
     router.db_connection.row_factory = lambda cursor, x: x[0]
-    cursor = await router.db_connection.execute("SELECT Name FROM tracks WHERE Composer = ? ORDER BY Name;", (composer_name))
+    cursor = await router.db_connection.execute("SELECT Name FROM tracks WHERE Composer = ? ORDER BY Name;", (composer_name, ))
     data = await cursor.fetchall()
     if not data:
-        raise HTTPException(status_code=404, detail="error")
+        raise HTTPException(status_code=404, detail={"error": "composer not found"})
     return data
+
+class Album(BaseModel):
+    title: str
+    artist_id: int
+
+class AlbumResponse(BaseModel):
+    AlbumId: int
+    title: str
+    artist_id: int
+
+@router.post("/albums", response_model=AlbumResponse, status_code=201)
+async def post_album(request: Album):
+    check = router.db_connection.execute("SELECT ArtistId FROM artists WHERE ArtistId = ?;", (request.artist_id,)).fetchone()
+    if not check:
+        raise HTTPException(status_code=404, detail={"error": "artist_id not found"})
+    cursor = router.db_connection.execute("INSERT INTO albums (title, artistid) VALUES (?, ?);", (request.title, request.artist_id),)
+    await router.db_connection.commit()
+    return AlbumResponse(AlbumId = cursor.lastrowid, title = request.title, artist_id = request.artist_id)
+
+@router.get("/albums/{album_id}", response_model=AlbumResponse, status_code=200)
+async def get_album(album_id: int):
+    app.db_connection.row_factory = lambda cursor, x: x[0]
+    album = router.db_connection.execute("SELECT * FROM albums WHERE AlbumId = ?", (album_id,)).fetchone()
+    if not album:
+        raise HTTPException(status_code=404, detail={"error": "artist_id not found"})
+    return album
