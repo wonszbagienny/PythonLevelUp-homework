@@ -37,7 +37,7 @@ async def tracks(page: int = 0, per_page: int = 10):
 @router.get("/tracks/composers/")
 async def composers(composer_name: str):
     router.db_connection.row_factory = lambda cursor, x: x[0]
-    cursor = await router.db_connection.execute("SELECT Name FROM tracks WHERE Composer = ?;", (composer_name))
+    cursor = await router.db_connection.execute("SELECT Name FROM tracks WHERE Composer = ? ORDER BY Name;", (composer_name,))
     data = await cursor.fetchall()
     if len(data) == 0:
         raise HTTPException(status_code=404, detail="error")
