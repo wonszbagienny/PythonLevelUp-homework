@@ -30,13 +30,13 @@ class Track(BaseModel):
 @router.get("/tracks", response_model=List[Track])
 async def tracks(page: int = 0, per_page: int = 10):
     router.db_connection.row_factory = aiosqlite.Row
-    cursor = await router.dob_connection.execute("SELECT * FROM tracks ORDER BY trackid LIMIT ? OFFSET ?;", (per_page, page * per_page))
+    cursor = await router.db_connection.execute("SELECT * FROM tracks ORDER BY trackid LIMIT ? OFFSET ?;", (per_page, page * per_page))
     data = await cursor.fetchall()
     return data
 
-@router.get("/customers")
-async def customers():
-    db_connection.row_factory = aiosqlite.Row
-    cursor = await db_connection.execute("SELECT Email FROM customers")
-    data = await cursor.fetchall()
-    return data
+#@router.get("/customers")
+#async def customers():
+#    db_connection.row_factory = aiosqlite.Row
+#    cursor = await db_connection.execute("SELECT Email FROM customers")
+#    data = await cursor.fetchall()
+#    return data
